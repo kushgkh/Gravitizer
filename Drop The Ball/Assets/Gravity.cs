@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-
+using UnityEngine.UI;
 
 public class Gravity : MonoBehaviour {
 	Rigidbody rb;
@@ -9,6 +9,7 @@ public class Gravity : MonoBehaviour {
 	public GameObject arrow;
 	bool isShot = false;
 	Vector3 ballPInit;
+	public Camera cam;
 
 	public bool reset = false;
 	// Use this for initialization
@@ -25,12 +26,20 @@ public class Gravity : MonoBehaviour {
 		if (Input.GetMouseButtonDown (0)) {
 			
 			arrow.SetActive (true);
-			pInit = new Vector3 (470, 265, 0);
-			Debug.Log (Input.mousePosition);
+			//pInit = new Vector3 (470, 265, 0);
+			pInit = Input.mousePosition;
+
+
+			Vector3 vec = cam.ScreenToWorldPoint (pInit);
+			Debug.Log (vec);
+			arrow.transform.position = vec;
+			//Debug.Log (Input.mousePosition);
 		}
 		if (Input.GetMouseButton (0)) {
 			pFinal = Input.mousePosition;
-			arrow.transform.localScale = new Vector3 (Vector3.Distance (pInit, pFinal)/2, 5, 1);
+			//arrow.transform.localScale = new Vector3 (Vector3.Distance (pInit, pFinal)/2, 5, 1);
+			Rect arrowRect = new Rect(0,0,0,Vector3.Distance (pInit, pFinal));
+			arrow.GetComponent<RectTransform> ().sizeDelta = new Vector2 (227f, Vector3.Distance (pInit, pFinal) * 10f);
 
 
 			float angle = Mathf.Atan ((pFinal.y - pInit.y) / (pFinal.x - pInit.x));
@@ -40,7 +49,9 @@ public class Gravity : MonoBehaviour {
 				angle += 180;
 			} 
 			//Debug.Log (angle);
-			arrow.transform.eulerAngles = new Vector3(0,0 ,angle);
+			arrow.transform.eulerAngles = new Vector3(0,0 ,angle + 90);
+
+
 
 		}
 		if (Input.GetMouseButtonUp (0)) {
@@ -54,7 +65,7 @@ public class Gravity : MonoBehaviour {
 		}
 
 		if (reset) {
-			arrow.transform.localScale = Vector3.zero;
+			arrow.GetComponent<RectTransform> ().sizeDelta = new Vector2 (0, 0);
 			transform.position = ballPInit;
 			rb.velocity = Vector3.zero;
 			isShot = false;
