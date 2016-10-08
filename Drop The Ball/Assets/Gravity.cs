@@ -23,6 +23,10 @@ public class Gravity : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
+		if (Input.GetKeyDown(KeyCode.Space)) {
+			reset = true;
+		}
+
 		if (Input.GetMouseButtonDown (0)) {
 			
 			arrow.SetActive (true);
