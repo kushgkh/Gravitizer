@@ -10,7 +10,7 @@ public class Gravity : MonoBehaviour {
 	bool isShot = false;
 	Vector3 ballPInit;
 	public Camera cam;
-
+	Vector3 vec;
 	public bool reset = false;
 	// Use this for initialization
 	void Start () {
@@ -30,7 +30,7 @@ public class Gravity : MonoBehaviour {
 			pInit = Input.mousePosition;
 
 
-			Vector3 vec = cam.ScreenToWorldPoint (pInit);
+			vec = cam.ScreenToWorldPoint (pInit);
 			Debug.Log (vec);
 			arrow.transform.position = vec;
 			//Debug.Log (Input.mousePosition);
@@ -40,7 +40,7 @@ public class Gravity : MonoBehaviour {
 			//arrow.transform.localScale = new Vector3 (Vector3.Distance (pInit, pFinal)/2, 5, 1);
 			Rect arrowRect = new Rect(0,0,0,Vector3.Distance (pInit, pFinal));
 			arrow.GetComponent<RectTransform> ().sizeDelta = new Vector2 (227f, Vector3.Distance (pInit, pFinal) * 10f);
-
+			arrow.transform.position = new Vector3 (vec.x, vec.y, 0);
 
 			float angle = Mathf.Atan ((pFinal.y - pInit.y) / (pFinal.x - pInit.x));
 			angle = angle * 180 / Mathf.PI;
@@ -65,6 +65,7 @@ public class Gravity : MonoBehaviour {
 		}
 
 		if (reset) {
+			arrow.transform.position = new Vector3 (0, 0, 0);
 			arrow.GetComponent<RectTransform> ().sizeDelta = new Vector2 (0, 0);
 			transform.position = ballPInit;
 			rb.velocity = Vector3.zero;
