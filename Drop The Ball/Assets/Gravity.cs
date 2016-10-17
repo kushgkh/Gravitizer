@@ -16,12 +16,19 @@ public class Gravity : MonoBehaviour {
 	float initAngle = 0;
 	float gravityAngle;
 	public static bool Suck = false;
+
+
+	public GameObject dot;
+	Vector3 dotUpdatePosition;
+	public float dotDistance = 1;
+	public GameObject dotParent;
 	// Use this for initialization
 	void Start () {
 		rb = GetComponent<Rigidbody> ();
 
 		arrow.SetActive (false);
 		ballPInit = transform.position;
+		dotUpdatePosition = ballPInit;
 	}
 	
 	// Update is called once per frame
@@ -81,7 +88,7 @@ public class Gravity : MonoBehaviour {
 		
 
 			if (Mathf.Abs(cam.transform.eulerAngles.z - gravityAngle - 90) < 2) {
-				rb.velocity = new Vector3 (5, 5, 0);
+				rb.velocity = new Vector3 (50, 50, 0);
 				spinning = false;
 				isShot = true;
 			}
@@ -89,7 +96,7 @@ public class Gravity : MonoBehaviour {
 		//Debug.Log (Suck);
 
 		if (isShot && !Suck) {
-			rb.AddForce ((pFinal - pInit) * 0.03f);
+			rb.AddForce ((pFinal - pInit) * 0.3f);
 		}
 		if (Suck) {
 			rb.velocity = Vector3.zero;
@@ -103,9 +110,17 @@ public class Gravity : MonoBehaviour {
 			transform.position = ballPInit;
 			rb.velocity = Vector3.zero;
 			cam.transform.eulerAngles = Vector3.zero;
+			GetComponent<SpriteRenderer> ().enabled = true;
 			isShot = false;
 			reset = false;
 		}
 			
+
+		if (Vector3.Distance (dotUpdatePosition, transform.position) > dotDistance) {
+			GameObject dt = Instantiate (dot, transform.position, Quaternion.identity) as GameObject;
+			dt.transform.SetParent (dotParent.transform);
+			dotUpdatePosition = transform.position;
+
+		}
 	}
 }

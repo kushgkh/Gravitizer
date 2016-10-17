@@ -8,7 +8,10 @@ public class Suction : MonoBehaviour {
 	Vector3 initPos;
 	public GameObject explosion;
 
+	public float wormHoleStrength=1;
 	float t=0;
+
+	public GameObject wormholeCollapse;
 	// Use this for initialization
 	void Start () {
 	
@@ -18,20 +21,16 @@ public class Suction : MonoBehaviour {
 	void Update () {
 		
 		if (Vector3.Distance (ball.transform.position, transform.position) < d) {
-			if (!Gravity.Suck) {
-				initPos = ball.transform.position;
-			}
-			Gravity.Suck = true;
-			//Debug.Log (Vector3.Distance (ball.transform.position, transform.position));
-			if (t < 1) {
-				ball.transform.position = Vector3.Lerp (initPos, transform.position, t);
-				t +=  2 * Time.deltaTime;
+			
+			//Gravity.Suck = true;
+			if (Vector3.Distance (ball.transform.position, transform.position) < 20) {
+				//explosion.SetActive (true);
+				wormholeCollapse.GetComponent<Animator>().SetBool("collapse",true);
+				ball.GetComponent<SpriteRenderer> ().enabled = false;
+				ball.GetComponent<Rigidbody> ().velocity = Vector3.zero;
+				//Gravity.Suck = false;
 			} else {
-				Debug.Log ("yo");
-				Gravity.Suck = false;
-				explosion.SetActive (true);
-				ball.transform.position = new Vector3 (-100, -100, 50);
-				t = 0;
+				ball.GetComponent<Rigidbody> ().AddForce (wormHoleStrength * (transform.position - ball.transform.position) / Vector3.Distance (ball.transform.position, transform.position));
 			}
 		}
 		if (Input.GetKeyDown ("space")) {
