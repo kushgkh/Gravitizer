@@ -19,6 +19,8 @@ public class Gravity : MonoBehaviour {
 	public static Vector3 gravity;
 	public static bool pause  = false;
 	Vector3 ballVelocity;
+	public GameObject velocityArrow;
+	public float velocityMagnitude;
 
 
 	public GameObject dot;
@@ -66,13 +68,17 @@ public class Gravity : MonoBehaviour {
 				if (pFinal.x - pInit.x < 0) {
 					angle += 180;
 				} 
+				angle += 90;
 				gravityAngle = angle;
 				//Debug.Log (angle);
-				arrow.transform.eulerAngles = new Vector3(0,0 ,angle + 90);
+				arrow.transform.eulerAngles = new Vector3(0,0 ,angle);
 
 			}
 			if (Input.GetMouseButtonUp (0)) {
 				gravity = (pFinal - pInit) * 0.3f;
+
+				gravity = gravity.normalized * 30;
+
 				spinning = true;
 			}
 			
@@ -88,14 +94,28 @@ public class Gravity : MonoBehaviour {
 
 
 		if (spinning) {
+
+
+			if (gravityAngle < 180) {
+				cam.transform.eulerAngles= new Vector3(0,0 ,cam.transform.eulerAngles.z + 3);
+			}
+			else
+			{
+				cam.transform.eulerAngles= new Vector3(0,0 ,cam.transform.eulerAngles.z - 3);
+			}
+
+			if (Mathf.Abs(cam.transform.eulerAngles.z - (gravityAngle)) < 5) {
+
+
+
+				float y= Mathf.Cos (velocityArrow.transform.rotation.eulerAngles.z * Mathf.PI / 180.0f);
+				float x = -Mathf.Sin (velocityArrow.transform.rotation.eulerAngles.z * Mathf.PI / 180.0f);
 			
-			float deltaAngle = ((gravityAngle + 90) ) * Time.deltaTime;
-
-			cam.transform.eulerAngles= new Vector3(0,0 ,cam.transform.eulerAngles.z + deltaAngle);
 
 
-			if (Mathf.Abs(cam.transform.eulerAngles.z - gravityAngle - 90) < 2) {
-				rb.velocity = new Vector3 (50, 50, 0);
+			
+
+				rb.velocity = new Vector3 (x * velocityMagnitude , y * velocityMagnitude, 0);
 				spinning = false;
 				isShot = true;
 
