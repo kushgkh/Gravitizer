@@ -7,6 +7,7 @@ public class Suction : MonoBehaviour {
 	public float d;
 	Vector3 initPos;
 	public GameObject explosion;
+	public GameObject win;
 
 	public float wormHoleStrength=1;
 	float t=0;
@@ -23,11 +24,12 @@ public class Suction : MonoBehaviour {
 		if (Vector3.Distance (ball.transform.position, transform.position) < d) {
 			
 			//Gravity.Suck = true;
-			if (Vector3.Distance (ball.transform.position, transform.position) < 20) {
+			if (Vector3.Distance (ball.transform.position, transform.position) < 20) { //if the ball gets sucked in
 				//explosion.SetActive (true);
 				wormholeCollapse.GetComponent<Animator>().SetBool("collapse",true);
 				ball.GetComponent<SpriteRenderer> ().enabled = false;
 				ball.GetComponent<Rigidbody> ().velocity = Vector3.zero;
+				win.SetActive (true);
 				//Gravity.Suck = false;
 			} else {
 				ball.GetComponent<Rigidbody> ().AddForce (wormHoleStrength * (transform.position - ball.transform.position) / Vector3.Distance (ball.transform.position, transform.position));
