@@ -16,6 +16,9 @@ public class Gravity : MonoBehaviour {
 	float initAngle = 0;
 	float gravityAngle;
 	public static bool Suck = false;
+	public static Vector3 gravity;
+	public static bool pause  = false;
+	Vector3 ballVelocity;
 
 
 	public GameObject dot;
@@ -67,36 +70,42 @@ public class Gravity : MonoBehaviour {
 				//Debug.Log (angle);
 				arrow.transform.eulerAngles = new Vector3(0,0 ,angle + 90);
 
-
-
 			}
 			if (Input.GetMouseButtonUp (0)) {
-				
-
-
-
-
+				gravity = (pFinal - pInit) * 0.3f;
 				spinning = true;
 			}
 			
 		}
 
+		if (!pause) {
+			ballVelocity = rb.velocity;
+		}
+		else
+		{
+			ballVelocity = Vector3.zero;
+		}
+
+
 		if (spinning) {
-			float deltaAngle = ((gravityAngle + 90) - 0) * Time.deltaTime;
 			
+			float deltaAngle = ((gravityAngle + 90) ) * Time.deltaTime;
+
 			cam.transform.eulerAngles= new Vector3(0,0 ,cam.transform.eulerAngles.z + deltaAngle);
-		
+
 
 			if (Mathf.Abs(cam.transform.eulerAngles.z - gravityAngle - 90) < 2) {
 				rb.velocity = new Vector3 (50, 50, 0);
 				spinning = false;
 				isShot = true;
+
 			}
 		}
 		//Debug.Log (Suck);
 
 		if (isShot && !Suck) {
-			rb.AddForce ((pFinal - pInit) * 0.3f);
+
+			rb.AddForce (gravity);
 		}
 		if (Suck) {
 			rb.velocity = Vector3.zero;
