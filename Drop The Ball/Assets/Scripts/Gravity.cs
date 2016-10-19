@@ -42,7 +42,7 @@ public class Gravity : MonoBehaviour {
 		if (Input.GetKeyDown(KeyCode.Space)) {
 			reset = true;
 		}
-		if (!isShot) {
+		if (!isShot && !spinning) {
 			if (Input.GetMouseButtonDown (0)) {
 
 				arrow.SetActive (true);
@@ -79,7 +79,17 @@ public class Gravity : MonoBehaviour {
 
 				gravity = gravity.normalized * 30;
 
-				spinning = true;
+				if (gravity.magnitude > 0)
+				{
+					spinning = true;
+				}
+				else
+				{
+					arrow.SetActive (false);
+				}
+
+
+
 			}
 			
 		}
@@ -94,9 +104,10 @@ public class Gravity : MonoBehaviour {
 
 
 		if (spinning) {
+			Debug.Log (gravityAngle);
 
-
-			if (gravityAngle < 180) {
+			if (gravityAngle < 180)
+			{
 				cam.transform.eulerAngles= new Vector3(0,0 ,cam.transform.eulerAngles.z + 3);
 			}
 			else
@@ -109,8 +120,7 @@ public class Gravity : MonoBehaviour {
 
 
 				float y= Mathf.Cos (velocityArrow.transform.rotation.eulerAngles.z * Mathf.PI / 180.0f);
-				float x = -Mathf.Sin (velocityArrow.transform.rotation.eulerAngles.z * Mathf.PI / 180.0f);
-			
+				float x = -Mathf.Sin (velocityArrow.transform.rotation.eulerAngles.z * Mathf.PI / 180.0f);	
 
 
 			
