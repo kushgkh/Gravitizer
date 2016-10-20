@@ -27,8 +27,15 @@ public class Gravity : MonoBehaviour {
 	Vector3 dotUpdatePosition;
 	public float dotDistance = 1;
 	public GameObject dotParent;
+
+	float camSize;
+	float initCamSize;
+	float camSizeScalar = 80f;
+	float angleConversion;
 	// Use this for initialization
 	void Start () {
+		initCamSize = cam.GetComponent<Camera> ().orthographicSize;
+		camSize = initCamSize;
 		rb = GetComponent<Rigidbody> ();
 
 		arrow.SetActive (false);
@@ -47,20 +54,23 @@ public class Gravity : MonoBehaviour {
 
 				arrow.SetActive (true);
 				//pInit = new Vector3 (470, 265, 0);
-				pInit = Input.mousePosition;
+				pInit = transform.position;
 
 
-				vec = cam.ScreenToWorldPoint (pInit);
-				Debug.Log (vec);
-				arrow.transform.position = vec;
+				//vec = cam.ScreenToWorldPoint (pInit);
+				vec = pInit;
+
+				//Debug.Log (vec);
+				//arrow.transform.position = vec;
 				//Debug.Log (Input.mousePosition);
 			}
 			if (Input.GetMouseButton (0)) {
 				pFinal = Input.mousePosition;
+				pFinal = cam.ScreenToWorldPoint (pFinal);
 				//arrow.transform.localScale = new Vector3 (Vector3.Distance (pInit, pFinal)/2, 5, 1);
 				Rect arrowRect = new Rect(0,0,0,Vector3.Distance (pInit, pFinal));
-				arrow.GetComponent<RectTransform> ().sizeDelta = new Vector2 (227f, Vector3.Distance (pInit, pFinal) * 10f);
-				arrow.transform.position = new Vector3 (vec.x, vec.y, 0);
+				//arrow.GetComponent<RectTransform> ().sizeDelta = new Vector2 (227f, Vector3.Distance (pInit, pFinal) * 10f);
+				//arrow.transform.position = new Vector3 (vec.x, vec.y, 0);
 
 				float angle = Mathf.Atan ((pFinal.y - pInit.y) / (pFinal.x - pInit.x));
 				angle = angle * 180 / Mathf.PI;
@@ -76,7 +86,8 @@ public class Gravity : MonoBehaviour {
 			}
 			if (Input.GetMouseButtonUp (0)) {
 				gravity = (pFinal - pInit) * 0.3f;
-
+				gravity = new Vector3 (gravity.x, gravity.y, 0);
+				//Debug.Log (gravityAngle);
 				gravity = gravity.normalized * 30;
 
 				if (gravity.magnitude > 0)
@@ -85,7 +96,7 @@ public class Gravity : MonoBehaviour {
 				}
 				else
 				{
-					arrow.SetActive (false);
+					//arrow.SetActive (false);
 				}
 
 
@@ -104,25 +115,38 @@ public class Gravity : MonoBehaviour {
 
 
 		if (spinning) {
-			Debug.Log (gravityAngle);
+			//Debug.Log (gravityAngle);
+
 
 			if (gravityAngle < 180)
 			{
 				cam.transform.eulerAngles= new Vector3(0,0 ,cam.transform.eulerAngles.z + 3);
+
 			}
 			else
 			{
 				cam.transform.eulerAngles= new Vector3(0,0 ,cam.transform.eulerAngles.z - 3);
 			}
 
-			if (Mathf.Abs(cam.transform.eulerAngles.z - (gravityAngle)) < 5) {
+			if (Mathf.Abs (cam.transform.eulerAngles.z - (gravityAngle)) < 5) {
 
 
 
-				float y= Mathf.Cos (velocityArrow.transform.rotation.eulerAngles.z * Mathf.PI / 180.0f);
+				float y = Mathf.Cos (velocityArrow.transform.rotation.eulerAngles.z * Mathf.PI / 180.0f);
 				float x = -Mathf.Sin (velocityArrow.transform.rotation.eulerAngles.z * Mathf.PI / 180.0f);	
 
 
+				if (gravityAngle < 90) {
+					angleConversion = gravityAngle;
+				} else if (gravityAngle < 180) {
+					angleConversion = gravityAngle - 90;
+				} else if (gravityAngle < 270) {
+					angleConversion = gravityAngle - 180;
+				} else if (gravityAngle < 360) {
+					angleConversion = gravityAngle - 270;
+				}
+				camSize+=angleConversion/90*camSizeScalar;
+				//cam.GetComponent<Camera> ().orthographicSize = camSize;
 			
 
 				rb.velocity = new Vector3 (x * velocityMagnitude , y * velocityMagnitude, 0);
@@ -130,6 +154,7 @@ public class Gravity : MonoBehaviour {
 				isShot = true;
 
 			}
+
 		}
 		//Debug.Log (Suck);
 
@@ -144,14 +169,21 @@ public class Gravity : MonoBehaviour {
 
 		if (reset) {
 			Suck = false;
-			arrow.transform.position = new Vector3 (0, 0, 0);
-			arrow.GetComponent<RectTransform> ().sizeDelta = new Vector2 (0, 0);
-			transform.position = ballPInit;
-			rb.velocity = Vector3.zero;
+			//arrow.transform.position = new Vector3 (0, 0, 0);
+			//arrow.GetComponent<RectTransform> ().sizeDelta = new Vector2 (0, 0);
+
 			cam.transform.eulerAngles = Vector3.zero;
 			GetComponent<SpriteRenderer> ().enabled = true;
 			isShot = false;
 			reset = false;
+			foreach (Transform child in dotParent.transform) {
+				Destroy (child.gameObject);
+			}
+			transform.position = ballPInit;
+			rb.velocity = Vector3.zero;
+			rb.angularVelocity = Vector3.zero;
+			rb.Sleep ();
+			camSize=initCamSize;
 		}
 			
 
