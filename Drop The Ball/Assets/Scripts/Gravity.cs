@@ -32,6 +32,7 @@ public class Gravity : MonoBehaviour {
 	float initCamSize;
 	float camSizeScalar = 80f;
 	float angleConversion;
+	float initangle;
 	// Use this for initialization
 	void Start () {
 		initCamSize = cam.GetComponent<Camera> ().orthographicSize;
@@ -49,14 +50,33 @@ public class Gravity : MonoBehaviour {
 		if (Input.GetKeyDown(KeyCode.Space)) {
 			reset = true;
 		}
+		if (isShot) {
+			if (Input.GetMouseButtonUp (0)) {
+				reset = true;
+			}
+		}
 		if (!isShot && !spinning) {
 			if (Input.GetMouseButtonDown (0)) {
 
 				arrow.SetActive (true);
 				//pInit = new Vector3 (470, 265, 0);
-				pInit = transform.position;
+				pInit = Vector3.zero;
+				pFinal = Input.mousePosition;
+				pFinal = cam.ScreenToWorldPoint (pFinal);
+				//arrow.transform.localScale = new Vector3 (Vector3.Distance (pInit, pFinal)/2, 5, 1);
+				Rect arrowRect = new Rect(0,0,0,Vector3.Distance (pInit, pFinal));
+				//arrow.GetComponent<RectTransform> ().sizeDelta = new Vector2 (227f, Vector3.Distance (pInit, pFinal) * 10f);
+				//arrow.transform.position = new Vector3 (vec.x, vec.y, 0);
 
+				float angle = Mathf.Atan ((pFinal.y - pInit.y) / (pFinal.x - pInit.x));
+				angle = angle * 180 / Mathf.PI;
 
+				if (pFinal.x - pInit.x < 0) {
+					angle += 180;
+				} 
+				angle += 90;
+
+				initangle = angle;
 				//vec = cam.ScreenToWorldPoint (pInit);
 				vec = pInit;
 
@@ -79,16 +99,43 @@ public class Gravity : MonoBehaviour {
 					angle += 180;
 				} 
 				angle += 90;
+
+
+				cam.transform.eulerAngles = new Vector3(0,0 , cam.transform.eulerAngles.z + (initangle - angle));
+
+
+				pFinal = Input.mousePosition;
+				pFinal = cam.ScreenToWorldPoint (pFinal);
+				//arrow.transform.localScale = new Vector3 (Vector3.Distance (pInit, pFinal)/2, 5, 1);
+			
+				//arrow.GetComponent<RectTransform> ().sizeDelta = new Vector2 (227f, Vector3.Distance (pInit, pFinal) * 10f);
+				//arrow.transform.position = new Vector3 (vec.x, vec.y, 0);
+
+				angle = Mathf.Atan ((pFinal.y - pInit.y) / (pFinal.x - pInit.x));
+				angle = angle * 180 / Mathf.PI;
+
+				if (pFinal.x - pInit.x < 0) {
+					angle += 180;
+				} 
+				angle += 90;
+
+				initangle = angle;
+
+
 				gravityAngle = angle;
 				//Debug.Log (angle);
 				arrow.transform.eulerAngles = new Vector3(0,0 ,angle);
 
 			}
 			if (Input.GetMouseButtonUp (0)) {
-				gravity = (pFinal - pInit) * 0.3f;
+				//Debug.Log (Mathf.Tan (cam.transform.eulerAngles.z));
+				Debug.Log (cam.transform.eulerAngles.z - 90);
+				gravity = new Vector3 (Mathf.Cos((cam.transform.eulerAngles.z - 90) * Mathf.PI/180f),Mathf.Sin((cam.transform.eulerAngles.z - 90)* Mathf.PI/180f), 0); //GRAVITY VECTOR
+
+
 				gravity = new Vector3 (gravity.x, gravity.y, 0);
-				//Debug.Log (gravityAngle);
-				gravity = gravity.normalized * 30;
+			//	Debug.Log (gravity.x+", "+gravity.y);
+				gravity = gravity.normalized * 50;
 
 				if (gravity.magnitude > 0)
 				{
@@ -115,9 +162,14 @@ public class Gravity : MonoBehaviour {
 
 
 		if (spinning) {
+			isShot = true;
+			float y = Mathf.Cos (velocityArrow.transform.rotation.eulerAngles.z * Mathf.PI / 180.0f);
+			float x = -Mathf.Sin (velocityArrow.transform.rotation.eulerAngles.z * Mathf.PI / 180.0f);	
+			rb.velocity = new Vector3 (x * velocityMagnitude , y * velocityMagnitude, 0);
+			spinning = false;
 			//Debug.Log (gravityAngle);
 
-
+			/*
 			if (gravityAngle < 180)
 			{
 				cam.transform.eulerAngles= new Vector3(0,0 ,cam.transform.eulerAngles.z + 3);
@@ -153,7 +205,7 @@ public class Gravity : MonoBehaviour {
 				spinning = false;
 				isShot = true;
 
-			}
+			}*/
 
 		}
 		//Debug.Log (Suck);
