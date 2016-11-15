@@ -224,7 +224,7 @@ public class Gravity : MonoBehaviour {
 			//arrow.transform.position = new Vector3 (0, 0, 0);
 			//arrow.GetComponent<RectTransform> ().sizeDelta = new Vector2 (0, 0);
 
-			cam.transform.eulerAngles = Vector3.zero;
+			//cam.transform.eulerAngles = Vector3.zero;
 			GetComponent<SpriteRenderer> ().enabled = true;
 			isShot = false;
 			reset = false;
