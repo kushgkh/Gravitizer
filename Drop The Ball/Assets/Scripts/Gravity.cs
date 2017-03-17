@@ -21,8 +21,8 @@ public class Gravity : MonoBehaviour {
 	Vector3 ballVelocity;
 	public GameObject velocityArrow;
 	public float velocityMagnitude;
-
-
+	Vector3 tempvel= Vector3.zero;
+	bool turned = false;
 	public GameObject dot;
 	Vector3 dotUpdatePosition;
 	public float dotDistance = 1;
@@ -153,11 +153,22 @@ public class Gravity : MonoBehaviour {
 		}
 
 		if (!pause) {
-			ballVelocity = rb.velocity;
+
+			if (turned) {
+				
+				rb.velocity = tempvel;
+				ballVelocity = tempvel;
+				turned = false;
+			}
+			tempvel= rb.velocity;
 		}
 		else
 		{
-			ballVelocity = Vector3.zero;
+			
+
+			turned = true;
+			
+			rb.velocity = Vector3.zero;
 		}
 
 
@@ -210,7 +221,7 @@ public class Gravity : MonoBehaviour {
 		}
 		//Debug.Log (Suck);
 
-		if (isShot && !Suck) {
+		if (isShot && !Suck && !pause) {
 
 			rb.AddForce (gravity);
 		}
@@ -245,5 +256,6 @@ public class Gravity : MonoBehaviour {
 			dotUpdatePosition = transform.position;
 
 		}
+
 	}
 }
